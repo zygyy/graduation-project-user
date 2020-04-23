@@ -34,11 +34,7 @@
                 <el-input v-model="employeeInformation.empId" disabled style="width:200px"></el-input>
               </el-form-item>
               <el-form-item label="姓名:">
-                <el-input
-                  v-model="employeeInformation.chineseName"
-                  disabled
-                  style="width:200px"
-                ></el-input>
+                <el-input v-model="employeeInformation.chineseName" disabled style="width:200px"></el-input>
               </el-form-item>
               <el-form-item label="性别:">
                 <el-select
@@ -172,11 +168,38 @@
                 <el-avatar v-if="imageUrl" style="margin-left:70px" :size="200" :src="imageUrl"></el-avatar>
                 <i v-else class="el-icon-plus avatar-uploader-icon; avatar-uploader"></i>
               </el-upload>
+              <el-button type="primary" @click="openUpdatePassword">修改密码</el-button>
             </el-tab-pane>
           </el-tabs>
         </el-form>
       </div>
     </el-card>
+
+    <el-dialog
+      title="密码修改中。。。。。"
+      :visible.sync="updatePasswordDialogVisible"
+      width="40%"
+      :before-close="updatePasswordCancel"
+    >
+      <el-form
+        :model="ruleForm"
+        :rules="rules"
+        ref="ruleFormRef"
+        label-width="100px"
+        class="demo-ruleForm"
+      >
+        <el-form-item label="新密码" prop="password">
+          <el-input v-model="ruleForm.password" type="password"></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="ensurePassword">
+          <el-input v-model="ruleForm.ensurePassword" type="password"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="updatePasswordCancel">取 消</el-button>
+        <el-button type="primary" @click="updatePasswordEnsure">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -205,6 +228,42 @@ export default {
       }
     };
     return {
+      //控制密码修改对话框
+      updatePasswordDialogVisible: false,
+      //修改密码
+      ruleForm: {
+        password: "",
+        ensurePassword: ""
+      },
+      //密码的验证规则
+      rules: {
+        password: [
+          {
+            required: true,
+            message: "请输入账号密码",
+            trigger: "blur"
+          },
+          {
+            min: 6,
+            max: 15,
+            message: "长度在6到15个字符",
+            trigger: "blur"
+          }
+        ],
+        ensurePassword: [
+          {
+            required: true,
+            message: "请输入账号密码",
+            trigger: "blur"
+          },
+          {
+            min: 6,
+            max: 15,
+            message: "长度在6到15个字符",
+            trigger: "blur"
+          }
+        ]
+      },
       //学位选择
       degreeOptions: [
         {
@@ -454,6 +513,40 @@ export default {
       } else {
         return this.$message.error(res.msg);
       }
+    },
+    //打开修改密码对话框
+    openUpdatePassword() {
+      this.updatePasswordDialogVisible = true;
+    },
+    //密码修改的确认按钮
+    updatePasswordEnsure() {
+      this.$refs.ruleFormRef.validate(async valid => {
+        if (!valid) {
+          return;
+        } else {
+          if (this.ruleForm.ensurePassword === this.ruleForm.password) {
+            const { data: res } = await this.$http.put(
+              "employee/updatePassword/"+
+              this.ruleForm.password
+            );
+            if (res.status === 200) {
+              this.$message.success(res.msg);
+              this.updatePasswordDialogVisible = false;
+            } else {
+              return this.$message.error(res.msg);
+            }
+          } else {
+            return this.$message.error("密码不一致，请重新输入！");
+          }
+        }
+      });
+    },
+    //密码修改对话框取消
+    updatePasswordCancel() {
+      this.ruleForm.password = "",
+      this.ruleForm.ensurePassword = "",
+      this.$refs.ruleFormRef.resetFields(),
+      this.updatePasswordDialogVisible = false;
     }
   }
 };

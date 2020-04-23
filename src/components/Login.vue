@@ -250,7 +250,7 @@ export default {
         } else {
           //登录请求
           const { data: result } = await this.$http.post(
-            "admin/login",
+            "employee/login",
             this.loginFrom
           );
           if (result.status === 500) {
