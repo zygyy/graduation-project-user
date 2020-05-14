@@ -6,6 +6,12 @@
         <div>
           <span>员工管理系统</span>
         </div>
+        <div style="margin-left: 800px;">编号：
+          <el-tag type="success">{{empId}}</el-tag>
+        </div>
+        <div style="margin-left: -10px;">姓名：
+           <el-tag type="primary">{{name}}</el-tag>
+        </div>
         <el-button type="info" @click="logout">退出</el-button>
       </el-header>
       <el-container>
@@ -48,7 +54,9 @@ export default {
       //左侧权限数据
       menulist: [],
       //被激活的链接地址
-      activePath: ""
+      activePath: "",
+      empId:window.sessionStorage.getItem("empId"),
+      name:window.sessionStorage.getItem("chineseName")
     };
   },
   created() {

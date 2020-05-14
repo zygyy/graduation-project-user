@@ -168,7 +168,7 @@
                 <el-avatar v-if="imageUrl" style="margin-left:70px" :size="200" :src="imageUrl"></el-avatar>
                 <i v-else class="el-icon-plus avatar-uploader-icon; avatar-uploader"></i>
               </el-upload>
-              <el-button type="primary" @click="openUpdatePassword">修改密码</el-button>
+              <el-button type="primary" @click="openUpdatePassword" style="margin-left: 120px;margin-top: 40px;">修改密码</el-button>
             </el-tab-pane>
           </el-tabs>
         </el-form>
@@ -452,7 +452,7 @@ export default {
               ) {
                 this.lianxiDisabled = true;
               } else {
-                this.updateEmployeeInformation();
+                this.updateEmployeeAndActiveInformation();
                 this.lianxiDisabled = true;
               }
             }
@@ -493,6 +493,25 @@ export default {
             }
           }
         });
+      }
+    },
+    //员工信息修改包括激活表
+    async updateEmployeeAndActiveInformation(){
+         this.employeeInformation.address = this.employeeInformation.address.join(
+        "/"
+      );
+      const { data: res } = await this.$http.put(
+        "employee/employeeAndActiveUpdate",
+        this.employeeInformation
+      );
+      if (res.status === 200) {
+        this.$message.success(res.msg);
+        this.cloneEmployeeInformation = this.employeeInformation;
+        this.employeeInformation.address = this.employeeInformation.address.split(
+          "/"
+        );
+      } else {
+        return this.$message.error(res.msg);
       }
     },
     //员工信息的修改
